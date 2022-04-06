@@ -171,6 +171,7 @@ resource "aws_lambda_function" "backendinterfaces" {
 
   runtime       = "nodejs14.x"
   architectures = ["arm64"]
+  memory_size   = 256
 
   environment {
     variables = local.function_environment
@@ -281,6 +282,7 @@ resource "aws_lambda_function" "provisioning" {
 
   runtime       = "nodejs14.x"
   architectures = ["arm64"]
+  memory_size   = 256
 
   environment {
     variables = local.function_environment
@@ -339,6 +341,7 @@ resource "aws_lambda_function" "claiming" {
 
   runtime       = "nodejs14.x"
   architectures = ["arm64"]
+  memory_size   = 256
 
   environment {
     variables = local.function_environment
@@ -397,6 +400,7 @@ resource "aws_lambda_function" "clients" {
 
   runtime       = "nodejs14.x"
   architectures = ["arm64"]
+  memory_size   = 256
 
   environment {
     variables = local.function_environment
