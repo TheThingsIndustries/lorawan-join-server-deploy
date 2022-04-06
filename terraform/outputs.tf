@@ -43,9 +43,9 @@ output "clients_function" {
   value       = local.clients_function
 }
 
-output "api_url" {
-  description = "The Things Join Server API Gateway URL"
-  value       = aws_apigatewayv2_stage.api.invoke_url
+output "url" {
+  description = "The Things Join Server URL"
+  value       = local.public_url
 }
 
 output "openapi_url" {
@@ -57,4 +57,9 @@ output "root_provisioner_password" {
   description = "Root Provisioner password"
   sensitive   = true
   value       = random_password.root_provisioner_password.result
+}
+
+output "domain_target" {
+  description = "Target name to configure as DNS CNAME record of your domain"
+  value       = var.domain != "" ? aws_apigatewayv2_domain_name.domain[0].domain_name_configuration[0].target_domain_name : ""
 }

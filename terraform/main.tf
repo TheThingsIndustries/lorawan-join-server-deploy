@@ -9,7 +9,7 @@ locals {
   claiming_function          = "${var.resource_prefix}-claiming"
   clients_function           = "${var.resource_prefix}-clients"
 
-  public_url = coalesce(var.public_url, trimsuffix(aws_apigatewayv2_stage.api.invoke_url, "/"))
+  public_url = var.domain == "" ? trimsuffix(aws_apigatewayv2_stage.api.invoke_url, "/") : "https://${var.domain}"
 
   function_environment = {
     JS_SSM_PARAMETER_PREFIX    = "/${var.ssm_parameter_prefix}"

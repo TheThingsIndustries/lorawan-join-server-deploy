@@ -3,7 +3,7 @@ variable "region" {
   default = "eu-west-1"
 }
 
-variable "public_url" {
+variable "domain" {
   type    = string
   default = ""
 }
