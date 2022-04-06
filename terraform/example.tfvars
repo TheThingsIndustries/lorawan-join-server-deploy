@@ -1,5 +1,8 @@
 ## AWS region
-region = "us-east-1"
+# region = "us-east-1"
+
+## Custom domain name
+# domain = "join.example.com"
 
 ## Uncomment to use the snapshot release of The Things Join Server.
 # release_channel = "snapshot"

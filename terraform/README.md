@@ -21,13 +21,14 @@ $ terraform init
 
 There are various variables to configure The Things Join Server deployment. The most important variables:
 
-| Name              | Description                                      | Default           |
-| ----------------- | ------------------------------------------------ | ----------------- |
-| `region`          | AWS region                                       | `eu-west-1`       |
-| `public_url`      | Public URL that is mapped to the API Gateway URL | Default stage URL |
-| `release_channel` | Version to deploy: `stable` or `snapshot`        | `stable`          |
-| `networks`        | LoRaWAN Network Servers                          | none              |
-| `applications`    | LoRaWAN Application Servers                      | none              |
+| Name              | Description                               | Default                               |
+| ----------------- | ----------------------------------------- | ------------------------------------- |
+| `region`          | AWS region                                | `eu-west-1`                           |
+| `domain`          | Custom domain name                        | none                                  |
+| `public_url`      | Public URL                                | `https://<domain>` or API Gateway URL |
+| `release_channel` | Version to deploy: `stable` or `snapshot` | `stable`                              |
+| `networks`        | LoRaWAN Network Servers                   | none                                  |
+| `applications`    | LoRaWAN Application Servers               | none                                  |
 
 Besides these variables, you can configure the resource prefixes and AWS IoT Core Thing Type name to keep multiple deployments of The Things Join Server in the same AWS account apart. It is recommended to use different AWS accounts for different The Things Join Server deployments.
 
@@ -36,6 +37,16 @@ For convenience, you can start your custom configuration from the example config
 ```bash
 $ cp example.tfvars custom.tfvars
 ```
+
+### Optional: Custom domain name
+
+Use the `domain` variable to use a custom domain name, like `join.example.com`.
+
+When using a custom domain, a certificate with AWS Certificate Manager (ACM) will be requested. This certificate uses DNS validation for proof of ownership of the domain name. During the deployment process, you have 45 minutes to verify the ownership of the domain name by creating a CNAME record for the DNS validation. [See DNS validation documentation](https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html).
+
+After you have deployed The Things Join Server with a custom domain name, create a DNS CNAME record for your domain with the Terraform output value `domain_target`.
+
+If you do not configure a custom domain, the public AWS API Gateway invocation URL will be used.
 
 ### Optional: Networks and Applications
 
@@ -69,7 +80,7 @@ $ terraform output -raw root_provisioner_password
 
 Get started with [`ttjs` CLI](https://www.npmjs.com/package/ttjs-cli) to manage The Things Join Server. When you run `ttjs init`, use the following settings:
 
-- **Server URL**: Terraform output `api_url`
+- **Server URL**: Terraform output `url`
 - **Configure Provisioner**: on
 - **Provisioner username**: `root`
 - **Provisioner password**: Terraform output `root_provisioner_password`
