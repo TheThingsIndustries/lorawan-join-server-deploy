@@ -44,8 +44,6 @@ Use the `domain` variable to use a custom domain name, like `join.example.com`.
 
 When using a custom domain, a certificate with AWS Certificate Manager (ACM) will be requested. This certificate uses DNS validation for proof of ownership of the domain name. During the deployment process, you have 45 minutes to verify the ownership of the domain name by creating a CNAME record for the DNS validation. [See DNS validation documentation](https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html).
 
-After you have deployed The Things Join Server with a custom domain name, create a DNS CNAME record for your domain with the Terraform output value `domain_target`.
-
 If you do not configure a custom domain, the public AWS API Gateway invocation URL will be used.
 
 ### Optional: Networks and Applications
@@ -65,6 +63,8 @@ $ terraform apply -var-file custom.tfvars
 You should see all resources being deployed. This may take a few minutes. When the deployment is done, you see various outputs specific to your deployment.
 
 > 🎉 Congratulations! You have now deployed The Things Join Server.
+
+After you have deployed The Things Join Server with a custom domain name, create a DNS CNAME record for your domain with the Terraform output value `domain_target`.
 
 ## Next Steps
 
