@@ -29,9 +29,17 @@ resource "aws_iam_policy" "provisioning" {
     {
       "Action": [
         "iot:CreateThing",
-        "iot:DescribeThing"
+        "iot:DescribeThing",
+        "iot:UpdateThing"
       ],
       "Resource": "arn:aws:iot:*:*:thing/*",
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "ssm:GetParameter"
+      ],
+      "Resource": "arn:aws:ssm:*:*:parameter/${var.ssm_parameter_prefix}/*",
       "Effect": "Allow"
     },
     {
@@ -42,6 +50,13 @@ resource "aws_iam_policy" "provisioning" {
         "dynamodb:DeleteItem"
       ],
       "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.things.name}",
+      "Effect": "Allow"
+    },
+    {
+      "Action": [
+        "dynamodb:PutItem"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.app_s_keys.name}",
       "Effect": "Allow"
     }
   ]
