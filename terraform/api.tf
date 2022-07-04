@@ -151,7 +151,8 @@ resource "aws_apigatewayv2_integration" "provisioning" {
   integration_method     = "POST"
   integration_uri        = aws_lambda_function.provisioning.invoke_arn
   passthrough_behavior   = "WHEN_NO_MATCH"
-  timeout_milliseconds   = 5000
+  # This is the maximum value; longer requests fail with HTTP 503 but continue for 5 minutes, see functions.tf.
+  timeout_milliseconds   = 29000
   payload_format_version = "1.0"
 }
 
