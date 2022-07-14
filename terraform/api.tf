@@ -211,9 +211,17 @@ resource "aws_apigatewayv2_route" "get_formats" {
   authorization_type = "NONE"
 }
 
+resource "aws_apigatewayv2_route" "list_provisioned_devices" {
+  api_id             = aws_apigatewayv2_api.api.id
+  route_key          = "GET /v1/provision/devices"
+  target             = "integrations/${aws_apigatewayv2_integration.provisioning.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.required_authorizer.id
+}
+
 resource "aws_apigatewayv2_route" "get_provisioned_device" {
   api_id             = aws_apigatewayv2_api.api.id
-  route_key          = "GET /v1/provision/{devEUI}"
+  route_key          = "GET /v1/provision/devices/{devEUI}"
   target             = "integrations/${aws_apigatewayv2_integration.provisioning.id}"
   authorization_type = "CUSTOM"
   authorizer_id      = aws_apigatewayv2_authorizer.required_authorizer.id

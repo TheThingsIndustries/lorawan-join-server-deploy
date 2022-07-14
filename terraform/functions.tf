@@ -47,7 +47,8 @@ resource "aws_iam_policy" "provisioning" {
         "dynamodb:GetItem",
         "dynamodb:PutItem",
         "dynamodb:UpdateItem",
-        "dynamodb:DeleteItem"
+        "dynamodb:DeleteItem",
+        "dynamodb:Scan"
       ],
       "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.things.name}",
       "Effect": "Allow"
