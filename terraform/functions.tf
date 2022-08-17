@@ -299,7 +299,7 @@ resource "aws_lambda_function" "provisioning" {
   runtime       = "nodejs14.x"
   architectures = ["arm64"]
   memory_size   = 256
-  timeout       = 300  # 5 minutes
+  timeout       = 300 # 5 minutes
 
   environment {
     variables = local.function_environment

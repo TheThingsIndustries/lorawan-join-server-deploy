@@ -146,11 +146,11 @@ resource "aws_apigatewayv2_integration" "provisioning" {
   api_id           = aws_apigatewayv2_api.api.id
   integration_type = "AWS_PROXY"
 
-  connection_type        = "INTERNET"
-  description            = "Claiming"
-  integration_method     = "POST"
-  integration_uri        = aws_lambda_function.provisioning.invoke_arn
-  passthrough_behavior   = "WHEN_NO_MATCH"
+  connection_type      = "INTERNET"
+  description          = "Claiming"
+  integration_method   = "POST"
+  integration_uri      = aws_lambda_function.provisioning.invoke_arn
+  passthrough_behavior = "WHEN_NO_MATCH"
   # This is the maximum value; longer requests fail with HTTP 503 but continue for 5 minutes, see functions.tf.
   timeout_milliseconds   = 29000
   payload_format_version = "1.0"
