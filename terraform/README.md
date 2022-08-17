@@ -99,7 +99,7 @@ You can pull this repository for updates to the Terraform Configuration. To appl
 # See if everything looks good:
 $ terraform plan -var-file custom.tfvars
 # Apply the update:
-$ terraform apply-var-file custom.tfvars
+$ terraform apply -var-file custom.tfvars
 ```
 
 You can also update the AWS Lambda function code by running the update script:
