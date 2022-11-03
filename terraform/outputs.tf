@@ -48,10 +48,16 @@ output "openapi_url" {
   value       = "${local.public_url}/api/v2/openapi.json"
 }
 
-output "root_provisioner_password" {
-  description = "Root Provisioner password"
+output "provisioner_passwords" {
+  description = "Provisioner passwords"
   sensitive   = true
-  value       = random_password.root_provisioner_password.result
+  value = [
+    for key, value in var.provisioners : {
+      username = key
+      name     = value.name
+      password = random_password.provisioner_password[key].result
+    }
+  ]
 }
 
 output "network_server_passwords" {

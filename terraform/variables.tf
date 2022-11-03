@@ -33,6 +33,23 @@ variable "ssm_parameter_prefix" {
   default = "lorawan/joinserver/v2"
 }
 
+variable "provisioners" {
+  type = map(object({
+    name = string
+  }))
+  default = {
+    "root" = {
+      name = "root"
+    }
+  }
+  validation {
+    condition = alltrue(
+      [for as_id, app in var.provisioners : can(regex("^[0-9a-zA-Z\\.-]+$", as_id))],
+    )
+    error_message = "Provisioner ID may only contain alphanumeric characters, dots, underscores and dashes."
+  }
+}
+
 variable "network_servers" {
   type = map(object({
     name = string

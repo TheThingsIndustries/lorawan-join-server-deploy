@@ -9,6 +9,13 @@
 # resource_prefix       = "lorawan-join-server"
 # ssm_parameter_prefix  = "lorawan/joinserver/v2"
 
+## Define Provisioners
+# provisioners = {
+#   "root" = {
+#     name = "root"
+#   }
+# }
+
 ## Define Network Servers.
 # network_servers = {
 #   "000000" = {

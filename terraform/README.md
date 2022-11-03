@@ -69,11 +69,13 @@ After you have deployed The Things Join Server with a custom domain name, create
 
 The Things Join Server uses HTTP Basic Authentication to authenticate Provisioners, Network Servers and Application Servers.
 
-The Terraform Configuration deploys a Provisioner with username `root` and a random password. You can obtain the password for `root` via:
+The Terraform Configuration deploys by default a Provisioner with username `root` and a random password. You can obtain the password for `root` via:
 
 ```bash
-$ terraform output -raw root_provisioner_password
+$ terraform output -raw provisioner_passwords
 ```
+
+Customize provisioners by setting the `provisioners` variable.
 
 You can see passwords for the configured Network Servers and Application Servers via:
 
@@ -88,8 +90,8 @@ Get started with [`ttjs` CLI](https://www.npmjs.com/package/ttjs-cli) to manage 
 
 - **Server URL**: Terraform output `url`
 - **Configure Provisioner**: on
-- **Provisioner username**: `root`
-- **Provisioner password**: Terraform output `root_provisioner_password`
+- **Provisioner username**: `root` (default)
+- **Provisioner password**: Terraform output `provisioner_passwords`
 
 ### The Things Join Server API
 
