@@ -1,13 +1,12 @@
 locals {
   s3_bucket   = "${var.source_s3_bucket_prefix}-${var.region}"
-  s3_code_key = "lorawan-join-server/v1/${var.release_channel}/lambda.zip"
+  s3_code_key = "lorawan-join-server/${var.release_version}.zip"
 
   openapi_function           = "${var.resource_prefix}-openapi"
   authorizer_function        = "${var.resource_prefix}-authorizer"
   backendinterfaces_function = "${var.resource_prefix}-bi"
   provisioning_function      = "${var.resource_prefix}-provisioning"
   claiming_function          = "${var.resource_prefix}-claiming"
-  clients_function           = "${var.resource_prefix}-clients"
 
   public_url = var.domain == "" ? trimsuffix(aws_apigatewayv2_stage.api.invoke_url, "/") : "https://${var.domain}"
 
@@ -15,8 +14,7 @@ locals {
     JS_SSM_PARAMETER_PREFIX    = "/${var.ssm_parameter_prefix}"
     JS_KMS_KEY_ID              = aws_kms_key.key.id
     JS_DYNAMODB_TABLE_APPSKEYS = aws_dynamodb_table.app_s_keys.id
-    JS_DYNAMODB_TABLE_THINGS   = aws_dynamodb_table.things.id
-    JS_IOT_THING_TYPE          = var.iot_thing_type
+    JS_DYNAMODB_TABLE_DEVICES  = aws_dynamodb_table.end_devices.id
     JS_PUBLIC_URL              = local.public_url
   }
 }
@@ -60,8 +58,7 @@ resource "aws_kms_key" "key" {
           "${aws_iam_role.authorizer.arn}",
           "${aws_iam_role.backendinterfaces.arn}",
           "${aws_iam_role.provisioning.arn}",
-          "${aws_iam_role.claiming.arn}",
-          "${aws_iam_role.clients.arn}"
+          "${aws_iam_role.claiming.arn}"
         ]
       },
       "Action": [
@@ -81,8 +78,7 @@ resource "aws_kms_key" "key" {
           "${aws_iam_role.authorizer.arn}",
           "${aws_iam_role.backendinterfaces.arn}",
           "${aws_iam_role.provisioning.arn}",
-          "${aws_iam_role.claiming.arn}",
-          "${aws_iam_role.clients.arn}"
+          "${aws_iam_role.claiming.arn}"
         ]
       },
       "Action": [
@@ -123,25 +119,26 @@ resource "aws_dynamodb_table" "app_s_keys" {
   table_class = "STANDARD_INFREQUENT_ACCESS"
 }
 
-resource "aws_dynamodb_table" "things" {
-  name         = "${var.resource_prefix}-things"
+resource "aws_dynamodb_table" "end_devices" {
+  name         = "${var.resource_prefix}-devices"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "ThingName"
+  hash_key     = "DevEUI"
   attribute {
-    name = "ThingName"
+    name = "DevEUI"
     type = "S"
+  }
+  attribute {
+    name = "ProvisionerID"
+    type = "S"
+  }
+  global_secondary_index {
+    hash_key        = "ProvisionerID"
+    name            = "ProvisionerIDIndex"
+    projection_type = "ALL"
   }
   server_side_encryption {
     enabled     = true
     kms_key_arn = aws_kms_key.key.arn
   }
   table_class = "STANDARD"
-}
-
-resource "aws_iot_thing_type" "thing_type" {
-  name = var.iot_thing_type
-  properties {
-    description           = "LoRaWAN Join Server things"
-    searchable_attributes = ["asID", "homeNetID", "homeNSID"]
-  }
 }

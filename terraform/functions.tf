@@ -28,15 +28,6 @@ resource "aws_iam_policy" "provisioning" {
   "Statement": [
     {
       "Action": [
-        "iot:CreateThing",
-        "iot:DescribeThing",
-        "iot:UpdateThing"
-      ],
-      "Resource": "arn:aws:iot:*:*:thing/*",
-      "Effect": "Allow"
-    },
-    {
-      "Action": [
         "ssm:GetParameter"
       ],
       "Resource": "arn:aws:ssm:*:*:parameter/${var.ssm_parameter_prefix}/*",
@@ -50,7 +41,7 @@ resource "aws_iam_policy" "provisioning" {
         "dynamodb:DeleteItem",
         "dynamodb:Scan"
       ],
-      "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.things.name}",
+      "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.end_devices.name}",
       "Effect": "Allow"
     },
     {
@@ -74,40 +65,10 @@ resource "aws_iam_policy" "claiming" {
   "Statement": [
     {
       "Action": [
-        "iot:DescribeThing",
-        "iot:UpdateThing"
-      ],
-      "Resource": "arn:aws:iot:*:*:thing/*",
-      "Effect": "Allow"
-    },
-    {
-      "Action": [
         "dynamodb:GetItem",
         "dynamodb:UpdateItem"
       ],
-      "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.things.name}",
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "clients" {
-  name = "${var.resource_prefix}-clients"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "ssm:GetParameter",
-        "ssm:GetParametersByPath",
-        "ssm:PutParameter",
-        "ssm:DeleteParameter"
-      ],
-      "Resource": "arn:aws:ssm:*:*:parameter/${var.ssm_parameter_prefix}/*",
+      "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.end_devices.name}",
       "Effect": "Allow"
     }
   ]
@@ -124,13 +85,6 @@ resource "aws_iam_policy" "backendinterfaces" {
   "Statement": [
     {
       "Action": [
-        "iot:DescribeThing"
-      ],
-      "Resource": "arn:aws:iot:*:*:thing/*",
-      "Effect": "Allow"
-    },
-    {
-      "Action": [
         "dynamodb:GetItem",
         "dynamodb:PutItem"
       ],
@@ -142,7 +96,7 @@ resource "aws_iam_policy" "backendinterfaces" {
         "dynamodb:GetItem",
         "dynamodb:UpdateItem"
       ],
-      "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.things.name}",
+      "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.end_devices.name}",
       "Effect": "Allow"
     },
     {
@@ -384,65 +338,6 @@ resource "aws_lambda_permission" "claiming_api" {
   statement_id  = "InvokeByAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.claiming.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_stage.api.execution_arn}/*"
-}
-
-resource "aws_iam_role" "clients" {
-  name = local.clients_function
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_lambda_function" "clients" {
-  function_name = local.clients_function
-  role          = aws_iam_role.clients.arn
-  handler       = "dist/aws/lambda.clientsHandler"
-
-  s3_bucket = local.s3_bucket
-  s3_key    = local.s3_code_key
-
-  runtime       = "nodejs14.x"
-  architectures = ["arm64"]
-  memory_size   = 256
-
-  environment {
-    variables = local.function_environment
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.clients,
-    aws_iam_role_policy_attachment.clients_logging,
-  ]
-}
-
-resource "aws_iam_role_policy_attachment" "clients" {
-  role       = aws_iam_role.clients.name
-  policy_arn = aws_iam_policy.clients.arn
-}
-
-resource "aws_iam_role_policy_attachment" "clients_logging" {
-  role       = aws_iam_role.clients.name
-  policy_arn = aws_iam_policy.logging.arn
-}
-
-resource "aws_lambda_permission" "clients_api" {
-  statement_id  = "InvokeByAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.clients.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_stage.api.execution_arn}/*"
 }

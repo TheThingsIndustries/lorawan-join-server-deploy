@@ -38,11 +38,6 @@ output "claiming_function" {
   value       = local.claiming_function
 }
 
-output "clients_function" {
-  description = "AWS Lambda function name for clients management"
-  value       = local.clients_function
-}
-
 output "url" {
   description = "The Things Join Server URL"
   value       = local.public_url
@@ -50,13 +45,37 @@ output "url" {
 
 output "openapi_url" {
   description = "OpenAPI URL"
-  value       = "${local.public_url}/v1/openapi.json"
+  value       = "${local.public_url}/api/v2/openapi.json"
 }
 
 output "root_provisioner_password" {
   description = "Root Provisioner password"
   sensitive   = true
   value       = random_password.root_provisioner_password.result
+}
+
+output "network_server_passwords" {
+  description = "Network Server passwords"
+  sensitive   = true
+  value = [
+    for key, value in var.network_servers : {
+      username = key
+      name     = value.name
+      password = random_password.network_server_password[key].result
+    }
+  ]
+}
+
+output "application_server_passwords" {
+  description = "Application Server passwords"
+  sensitive   = true
+  value = [
+    for key, value in var.application_servers : {
+      username = key
+      name     = value.name
+      password = random_password.application_server_password[key].result
+    }
+  ]
 }
 
 output "domain_target" {
