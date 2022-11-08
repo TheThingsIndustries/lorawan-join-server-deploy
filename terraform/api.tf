@@ -199,6 +199,14 @@ resource "aws_apigatewayv2_route" "get_device" {
   authorizer_id      = aws_apigatewayv2_authorizer.required_authorizer.id
 }
 
+resource "aws_apigatewayv2_route" "delete_device" {
+  api_id             = aws_apigatewayv2_api.api.id
+  route_key          = "DELETE /api/v2/devices/{devEUI}"
+  target             = "integrations/${aws_apigatewayv2_integration.provisioning.id}"
+  authorization_type = "CUSTOM"
+  authorizer_id      = aws_apigatewayv2_authorizer.required_authorizer.id
+}
+
 resource "aws_apigatewayv2_route" "get_device_claim" {
   api_id             = aws_apigatewayv2_api.api.id
   route_key          = "GET /api/v2/devices/{devEUI}/claim"
