@@ -57,9 +57,9 @@ variable "network_servers" {
   default = {}
   validation {
     condition = alltrue(
-      [for net_id, network in var.network_servers : can(regex("^[0-9A-F]{6}|[0-9A-F]{16}$", net_id))],
+      [for id, network in var.network_servers : can(regex("^[0-9A-F]{6}(\\/[0-9A-F]{16})?$", id))],
     )
-    error_message = "The key must be a NetID (6 hex digits) or NSID (16 hex digits)."
+    error_message = "The key must be a NetID (6 hex digits) with optional NSID (16 hex digits) separated by forward slash."
   }
 }
 

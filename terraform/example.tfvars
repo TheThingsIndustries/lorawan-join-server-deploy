@@ -18,11 +18,14 @@
 
 ## Define Network Servers.
 # network_servers = {
-#   "000000" = {
-#     name = "Network Server 1"
-#   }
 #   "000013" = {
 #     name = "The Things Network"
+#   }
+#   "000000/EC656E0000000001" = {
+#     name = "Network Server 1"
+#   }
+#   "000000/EC656E0000000002" = {
+#     name = "Network Server 2"
 #   }
 # }
 
