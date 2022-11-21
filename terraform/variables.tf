@@ -15,7 +15,7 @@ variable "source_s3_bucket_prefix" {
 
 variable "release_version" {
   type    = string
-  default = "2.0.0-rc.1"
+  default = "2.0.0-rc.2"
 }
 
 variable "kms_alias_name_prefix" {
