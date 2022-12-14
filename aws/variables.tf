@@ -3,34 +3,35 @@ variable "region" {
   default = "eu-west-1"
 }
 
-variable "domain" {
-  type    = string
-  default = ""
-}
-
-variable "source_s3_bucket_prefix" {
-  type    = string
-  default = "thethingsindustries"
-}
-
-variable "release_version" {
-  type    = string
-  default = "2.0.0-rc.2"
+variable "assume_role_principals" {
+  type        = list(string)
+  description = "Additional principals (users, roles) that can assume the role"
+  default     = []
 }
 
 variable "kms_alias_name_prefix" {
   type    = string
-  default = "alias/lorawan-join-server"
+  default = "alias/the-things-join-server"
 }
 
 variable "resource_prefix" {
   type    = string
-  default = "lorawan-join-server"
+  default = "the-things-join-server"
 }
 
 variable "ssm_parameter_prefix" {
   type    = string
-  default = "lorawan/joinserver/v2"
+  default = "the-things-join-server/v2"
+}
+
+variable "eks_cluster_name" {
+  type        = string
+  description = "EKS cluster name"
+}
+
+variable "kubernetes_namespace" {
+  type    = string
+  default = "default"
 }
 
 variable "provisioners" {
@@ -44,7 +45,7 @@ variable "provisioners" {
   }
   validation {
     condition = alltrue(
-      [for as_id, app in var.provisioners : can(regex("^[0-9a-zA-Z\\.-]+$", as_id))],
+      [for id, app in var.provisioners : can(regex("^[0-9a-zA-Z\\.-]+$", id))],
     )
     error_message = "Provisioner ID may only contain alphanumeric characters, dots, underscores and dashes."
   }
@@ -52,9 +53,15 @@ variable "provisioners" {
 
 variable "network_servers" {
   type = map(object({
-    name = string
+    name       = string
+    truststore = string
   }))
-  default = {}
+  default = {
+    "000013" = {
+      name       = "The Things Stack Cloud and Community Edition"
+      truststore = "truststores/the-things-industries.pem"
+    }
+  }
   validation {
     condition = alltrue(
       [for id, network in var.network_servers : can(regex("^[0-9A-F]{6}(\\/[0-9A-F]{16})?$", id))],
@@ -65,7 +72,8 @@ variable "network_servers" {
 
 variable "application_servers" {
   type = map(object({
-    name = string
+    name       = string
+    truststore = string
   }))
   default = {}
   validation {
