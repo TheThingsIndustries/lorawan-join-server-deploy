@@ -45,35 +45,39 @@ resource "aws_iam_policy" "server" {
   policy = data.aws_iam_policy_document.server_policy.json
 }
 
-data "aws_iam_policy_document" "assume_role_policy" {
-  statement {
-    sid     = "ServiceAccount"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-    effect  = "Allow"
-    condition {
-      test     = "StringEquals"
-      variable = "${local.eks_oidc_provider_url}:sub"
-      values   = ["system:serviceaccount:${var.kubernetes_namespace}:ttjs"]
-    }
-    principals {
-      identifiers = [local.eks_oidc_provider_arn]
-      type        = "Federated"
-    }
-  }
-  statement {
-    sid     = "AdditionalPrincipals"
-    actions = ["sts:AssumeRole"]
-    effect  = "Allow"
-    principals {
-      identifiers = var.assume_role_principals
-      type        = "AWS"
-    }
-  }
-}
-
 resource "aws_iam_role" "server" {
   name               = var.resource_prefix
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+  assume_role_policy = <<-EOT
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "ServiceAccount",
+        "Effect": "Allow",
+        "Principal": {
+          "Federated": "${local.eks_oidc_provider_arn}"
+        },
+        "Action": "sts:AssumeRoleWithWebIdentity",
+        "Condition": {
+          "StringEquals": {
+            "${local.eks_oidc_provider_url}:sub": "system:serviceaccount:${var.kubernetes_namespace}:ttjs"
+          }
+        }
+      }
+      ${length(var.assume_role_principals) == 0 ? "" : <<EOT
+      ,{
+        "Sid": "AdditionalPrincipals",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": ${jsonencode(var.assume_role_principals)}
+        },
+        "Action": "sts:AssumeRole"
+      }
+      EOT
+      }
+    ]
+  }
+  EOT
 }
 
 resource "aws_iam_role_policy_attachment" "server" {
@@ -81,73 +85,82 @@ resource "aws_iam_role_policy_attachment" "server" {
   policy_arn = aws_iam_policy.server.arn
 }
 
-data "aws_iam_policy_document" "kms_policy" {
-  statement {
-    sid    = "Enable IAM policies to administer the key"
-    effect = "Allow"
-    actions = [
-      "kms:Create*",
-      "kms:Describe*",
-      "kms:Enable*",
-      "kms:List*",
-      "kms:Put*",
-      "kms:Update*",
-      "kms:Revoke*",
-      "kms:Disable*",
-      "kms:Get*",
-      "kms:Delete*",
-      "kms:TagResource",
-      "kms:UntagResource",
-      "kms:ScheduleKeyDeletion",
-      "kms:CancelKeyDeletion"
-    ]
-    resources = ["*"]
-    principals {
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-      type        = "AWS"
-    }
-  }
-  statement {
-    sid    = "Allow use of the key"
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-      "kms:Encrypt",
-      "kms:GenerateDataKey*",
-      "kms:ReEncrypt*"
-    ]
-    resources = ["*"]
-    principals {
-      identifiers = [aws_iam_role.server.arn]
-      type        = "AWS"
-    }
-  }
-  statement {
-    sid    = "Allow attachment of persistent resources"
-    effect = "Allow"
-    actions = [
-      "kms:CreateGrant",
-      "kms:ListGrants",
-      "kms:RevokeGrant"
-    ]
-    resources = ["*"]
-    principals {
-      identifiers = [aws_iam_role.server.arn]
-      type        = "AWS"
-    }
-    condition {
-      test     = "Bool"
-      variable = "kms:GrantIsForAWSResource"
-      values   = ["true"]
-    }
-  }
-}
-
 resource "aws_kms_key" "key" {
   description             = "The Things Join Server"
   deletion_window_in_days = 30
-  policy                  = data.aws_iam_policy_document.kms_policy.json
+  policy                  = <<-EOT
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Enable IAM User Permissions",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        "Action": "kms:*",
+        "Resource": "*"
+      },
+      {
+        "Sid": "Allow access for Key Administrators",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "${aws_iam_role.server.arn}"
+        },
+        "Action": [
+          "kms:Create*",
+          "kms:Describe*",
+          "kms:Enable*",
+          "kms:List*",
+          "kms:Put*",
+          "kms:Update*",
+          "kms:Revoke*",
+          "kms:Disable*",
+          "kms:Get*",
+          "kms:Delete*",
+          "kms:TagResource",
+          "kms:UntagResource",
+          "kms:ScheduleKeyDeletion",
+          "kms:CancelKeyDeletion"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "Allow use of the key",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "${aws_iam_role.server.arn}"
+        },
+        "Action": [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:Encrypt",
+          "kms:GenerateDataKey*",
+          "kms:ReEncrypt*"
+        ],
+        "Resource": "*"
+      },
+      {
+        "Sid": "Allow attachment of persistent resources",
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "${aws_iam_role.server.arn}"
+        },
+        "Action": [
+          "kms:CreateGrant",
+          "kms:ListGrants",
+          "kms:RevokeGrant"
+        ],
+        "Resource": "*",
+        "Condition": {
+          "Bool": {
+            "kms:GrantIsForAWSResource": "true"
+          }
+        }
+      }
+    ]
+  }
+  EOT
 }
 
 resource "aws_kms_alias" "key" {
