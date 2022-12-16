@@ -1,0 +1,29 @@
+{{- if .Values.proxy.traefik.enabled -}}
+apiVersion: traefik.containo.us/v1alpha1
+kind: TLSOption
+metadata:
+  name: {{ include "ttjs.fullname" . }}
+  labels:
+    {{- include "ttjs.labels" . | nindent 4 }}
+  {{- with .Values.proxy.traefik.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  clientAuth:
+    clientAuthType: RequestClientCert
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "ttjs.fullname" . }}-passtlsclientcert
+  labels:
+    {{- include "ttjs.labels" . | nindent 4 }}
+  {{- with .Values.proxy.traefik.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  passTLSClientCert:
+    pem: true
+{{- end }}

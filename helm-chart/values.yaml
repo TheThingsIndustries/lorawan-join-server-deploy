@@ -1,0 +1,105 @@
+replicaCount: 1
+
+image:
+  repository: thethingsindustries/lorawan-join-server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# Configuration for Amazon Web Services (AWS)
+aws:
+  # The region to use.
+  # When deploying The Things Join Server on EKS, this value is set automatically
+  region: ""
+  # The secret name to use for AWS credentials.
+  # This secret must contain keys access_key_id and secret_access_key.
+  # When deploying The Things Join Server on EKS, leave empty, enable the service account and configure the role ARN
+  secretName: ""
+  # The IAM role ARN.
+  # If a service account is enabled, the role is attached to the service account.
+  # If a service account is disabled, The Things Join Server assumes this role
+  roleArn: ""
+  # Override the AWS Systems Manager parameter name prefix
+  ssmParameterPrefix: ""
+  # Override the DynamoDB table name for AppSKeys
+  appSKeysTableName: ""
+  # Override the DynamoDB table name for devices
+  devicesTableName: ""
+
+# Proxy configuration
+proxy:
+  # Traefik proxy settings
+  traefik:
+    # Specifies whether Traefik is used as proxy.
+    # This deploys Traefik TLS options and middleware and sets the ingress class and annotations.
+    enabled: false
+    annotations: {}
+    entrypoints:
+      - websecure
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: ttjs.local
+  tls: []
+  #  - secretName: ttjs-tls
+  #    hosts:
+  #      - ttjs.local
+
+resources:
+  {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

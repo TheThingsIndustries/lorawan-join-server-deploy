@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ttjs.fullname" . }}
+  labels:
+    {{- include "ttjs.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ttjs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ttjs.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ttjs.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            {{- with .Values.aws.region }}
+            - name: AWS_REGION
+              value: {{ . | quote }}
+            {{- end }}
+            {{- if not .Values.serviceAccount.create }}
+            {{- with .Values.aws.secretName }}
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: aws_access_key_id
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ . }}
+                  key: aws_secret_access_key
+            {{- end }}
+            {{- with .Values.aws.roleArn }}
+            - name: JS_AWS_ROLE_ARN
+              value: {{ . | quote }}
+            {{- end }}
+            {{- end }}
+            {{- with .Values.aws.ssmParameterPrefix }}
+            - name: JS_AWS_SSM_PARAMETER_PREFIX
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.aws.appSKeysTableName }}
+            - name: JS_DYNAMODB_TABLE_APPSKEYS
+              value: {{ . | quote }}
+            {{- end }}
+            {{- with .Values.aws.devicesTableName }}
+            - name: JS_DYNAMODB_TABLE_DEVICES
+              value: {{ . | quote }}
+            {{- end }}
+            {{- if and .Values.ingress.enabled .Values.ingress.hosts }}
+            {{- $scheme := (hasKey .Values.ingress "tls") | ternary "https" "http" -}}
+            {{- with .Values.ingress.hosts | first }}
+            - name: JS_PUBLIC_URL
+              value: {{ printf "%s://%s" $scheme .host | quote }}
+            {{- end }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 3000
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 3000
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}            
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
