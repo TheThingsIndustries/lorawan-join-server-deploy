@@ -1,8 +1,3 @@
-variable "region" {
-  type    = string
-  default = "eu-west-1"
-}
-
 variable "assume_role_principals" {
   type        = list(string)
   description = "Additional principals (users, roles) that can assume the role"

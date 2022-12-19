@@ -7,14 +7,4 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = var.region
-
-  default_tags {
-    tags = {
-      Deployment = "Join Server"
-    }
-  }
-}
-
 data "aws_caller_identity" "current" {}
