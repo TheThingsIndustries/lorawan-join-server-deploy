@@ -1,9 +1,15 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "ttjs.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+
+{{- $ingressClass := .Values.ingress.className -}}
+{{- if .Values.proxy.traefik.enabled -}}
+  {{- $ingressClass = default "traefik" $ingressClass }}
+{{- end }}
+
+{{- if and $ingressClass (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" $ingressClass}}
   {{- end }}
 {{- end }}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
@@ -31,9 +37,7 @@ metadata:
     {{- end }}
 spec:
   {{- if semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion }}
-  {{- if .Values.proxy.traefik.enabled }}
-  ingressClassName: {{ default "traefik" .Values.ingress.className }}
-  {{- end }}
+  ingressClassName: {{ $ingressClass }}
   {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
