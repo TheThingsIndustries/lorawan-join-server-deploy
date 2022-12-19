@@ -12,7 +12,7 @@ Prerequisites:
 
 ```hcl
 module "joinserver" {
-  source = "path/to/lorawan-join-server-deploy/aws"
+  source = "/path/to/lorawan-join-server-deploy/aws"
   
   # Custom resource names to keep multiple The Things Join Servers in the same AWS account apart.
   # kms_alias_name_prefix = "alias/the-things-join-server"
@@ -55,24 +55,26 @@ module "joinserver" {
     }
   }
 }
+
+output "provisioner_passwords" {
+  value     = module.joinserver.provisioner_passwords
+  sensitive = true
+}
+
+output "server_role_arn" {
+  value = module.joinserver.server_role_arn
+}
 ```
 
 ## Next Steps
 
 ### Deploy The Things Join Server
 
+You can see the IAM role ARN with `terraform output server_role_arn`. This role ARN is needed for The Things Join Server deployments.
+
 Deploy The Things Join Server using the Helm chart, [see instructions](../helm-chart/README.md).
 
-### View Provisioner Passwords
-
-Add the following output to your Terraform Configuration:
-
-```hcl
-output "provisioner_passwords" {
-  value     = module.joinserver.provisioner_passwords
-  sensitive = true
-}
-```
+### Configure Provisioners
 
 You can see the provisioner passwords with `terraform output provisioner_passwords`.
 
