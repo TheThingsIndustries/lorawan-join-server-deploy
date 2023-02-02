@@ -72,7 +72,10 @@ spec:
             - name: JS_DYNAMODB_TABLE_DEVICES
               value: {{ . | quote }}
             {{- end }}
-            {{- if and .Values.ingress.enabled .Values.ingress.hosts }}
+            {{- if .Values.publicURLOverride }}
+            - name: JS_PUBLIC_URL
+              value: {{ .Values.publicURLOverride | quote }}
+            {{- else if and .Values.ingress.enabled .Values.ingress.hosts }}
             {{- $scheme := (hasKey .Values.ingress "tls") | ternary "https" "http" -}}
             {{- with .Values.ingress.hosts | first }}
             - name: JS_PUBLIC_URL

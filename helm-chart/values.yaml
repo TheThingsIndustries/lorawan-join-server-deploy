@@ -30,12 +30,15 @@ aws:
 proxy:
   # Traefik proxy settings
   traefik:
-    # Specifies whether Traefik is used as proxy.
-    # This deploys Traefik TLS options and middleware and sets the ingress class and annotations.
+    # Specifies whether Traefik is used as proxy
+    # This deploys Traefik TLS options and middleware and sets the ingress class and annotations
     enabled: false
     annotations: {}
     entrypoints:
       - websecure
+
+# Overrides the public URL.
+publicURLOverride: ""
 
 imagePullSecrets: []
 nameOverride: ""

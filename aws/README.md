@@ -14,6 +14,12 @@ Prerequisites:
 module "joinserver" {
   source = "/path/to/lorawan-join-server-deploy/aws"
   
+  # EKS cluster name
+  eks_cluster_name = "thethingslabs"
+
+  # Kubernetes namespace
+  kubernetes_namespace = "joinserver"
+
   # Custom resource names to keep multiple The Things Join Servers in the same AWS account apart.
   # kms_alias_name_prefix = "alias/the-things-join-server"
   # resource_prefix       = "the-things-join-server"
