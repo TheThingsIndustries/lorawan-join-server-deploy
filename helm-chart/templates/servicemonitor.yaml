@@ -1,0 +1,29 @@
+{{ if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "ttjs.fullname" . }}
+  namespace: {{ quote (or .Values.serviceMonitor.namespace .Release.Namespace) }}
+  labels:
+    {{- include "ttjs.labels" . | nindent 4 }}
+    {{- range $key, $value := .Values.serviceMonitor.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  endpoints:
+  - port: http
+  {{- if .Values.serviceMonitor.path }}
+    path: {{ .Values.serviceMonitor.path }}
+  {{- end }}
+  {{- if .Values.serviceMonitor.interval }}
+    interval: {{ .Values.serviceMonitor.interval }}
+  {{- end }}
+  {{- if .Values.serviceMonitor.scrapeTimeout }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+  {{- end }}
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      {{- include "ttjs.selectorLabels" . | nindent 6 }}
+{{- end }}
