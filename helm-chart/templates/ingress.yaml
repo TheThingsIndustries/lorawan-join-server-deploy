@@ -1,6 +1,5 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "ttjs.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
 
 {{- $ingressClass := .Values.ingress.className -}}
 {{- if .Values.proxy.traefik.enabled -}}
@@ -63,11 +62,7 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
-                  number: {{ $svcPort }}
-              {{- else }}
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
-              {{- end }}
+                  number: 3000
           - path: /
             {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
             pathType: Exact
@@ -77,10 +72,6 @@ spec:
               service:
                 name: {{ $fullName }}
                 port:
-                  number: {{ $svcPort }}
-              {{- else }}
-              serviceName: {{ $fullName }}
-              servicePort: {{ $svcPort }}
-              {{- end }}
+                  number: 3000
     {{- end }}
 {{- end }}
