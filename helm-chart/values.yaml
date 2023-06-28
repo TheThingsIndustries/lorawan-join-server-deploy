@@ -70,7 +70,16 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 80
+
+serviceMonitor:
+  enabled: false
+  ## Specify the namespace where Prometheus Operator is running
+  ##
+  # namespace: monitor
+  labels: {}
+  path: /metrics
+  # interval:
+  # scrapeTimeout:
 
 ingress:
   enabled: true
