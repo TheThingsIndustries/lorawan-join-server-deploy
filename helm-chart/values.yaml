@@ -73,13 +73,15 @@ service:
 
 serviceMonitor:
   enabled: false
-  ## Specify the namespace where Prometheus Operator is running
-  ##
   # namespace: monitor
   labels: {}
   path: /metrics
   # interval:
   # scrapeTimeout:
+
+rules:
+  # namespace: monitor
+  labels: {}
 
 ingress:
   enabled: true

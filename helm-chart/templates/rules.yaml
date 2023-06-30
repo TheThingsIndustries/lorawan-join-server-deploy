@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "ttjs.fullname" . }}
+  namespace: {{ quote (or .Values.serviceMonitor.namespace .Release.Namespace) }}
+  labels:
+    {{- include "ttjs.labels" . | nindent 4 }}
+    {{- range $key, $value := .Values.rules.labels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  groups:
+    - name: ttjs.rules
+      rules:
+        - alert: TheThingsJoinServerNoJoinsAccepted
+          expr: sum by (namespace, job) (rate(ttjs_activations_total{error_type=""}[10m])) == 0
+          for: 15m
+          labels:
+            severity: high
+          annotations:
+            description: |-
+              {{`The Things Join Server {{ $labels.namespace }}/{{ $labels.job }} did not accept a join-request for 15 minutes.`}}
