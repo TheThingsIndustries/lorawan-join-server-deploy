@@ -82,6 +82,9 @@ serviceMonitor:
 rules:
   # namespace: monitor
   labels: {}
+  # Adjust this value based on the expected number of join-requests reaching this Join Server.
+  # E.g. when expecting multiple joins per minute, lower this to 1m; when expecting a few per hour, increase this to 1h.
+  # noJoinsAcceptedFor: 15m
 
 ingress:
   enabled: true

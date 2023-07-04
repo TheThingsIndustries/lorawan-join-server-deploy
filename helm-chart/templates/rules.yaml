@@ -13,10 +13,10 @@ spec:
     - name: ttjs.rules
       rules:
         - alert: TheThingsJoinServerNoJoinsAccepted
-          expr: sum by (namespace, job) (rate(ttjs_activations_total{error_type=""}[10m])) == 0
-          for: 15m
+          expr: sum(rate(ttjs_activations_total{namespace="{{ .Release.Namespace }}",job="{{ include "ttjs.fullname" . }}",error_type=""}[5m])) == 0
+          for: {{ .Values.rules.noJoinsAcceptedFor | default "15m" | quote }}
           labels:
             severity: high
           annotations:
             description: |-
-              {{`The Things Join Server {{ $labels.namespace }}/{{ $labels.job }} did not accept a join-request for 15 minutes.`}}
+              The Things Join Server {{ .Release.Namespace }}/{{ include "ttjs.fullname" . }} did not accept a join-request.
