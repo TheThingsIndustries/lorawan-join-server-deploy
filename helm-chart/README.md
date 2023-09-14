@@ -46,6 +46,8 @@ $ helm upgrade --install ttjs -f aws.values.yaml .
 
 ### Local
 
+Since The Things Join Server currently exclusively uses AWS backends, you can run The Things Join Server locally but it uses resources deployed in AWS. To proceed, make sure you deployed [The Things Join Server in AWS](../aws) for development.
+
 Install Traefik for local use:
 
 ```bash
@@ -58,8 +60,10 @@ $ helm upgrade --install traefik traefik/traefik \
 Generate a TLS server certificate that is valid for `localhost`:
 
 ```bash
-$ mkcert localhost 127.0.0.1 ::1
+$ CAROOT=. mkcert localhost 127.0.0.1 ::1
 ```
+
+> Make sure that `mkcert`'s root CA is trusted on your system; install via `CAROOT=. mkcert --install`.
 
 Kubernetes resources for the local deployment:
 
@@ -85,7 +89,7 @@ data:
   aws_secret_access_key: "" # AWS secret access key (base64)
 ```
 
-> The AWS credentials are used to assume The Things Join Server IAM role.
+> The AWS credentials are used to assume The Things Join Server IAM role. Make sure that you configured additional IAM principals via `assume_role_principals` of the Terraform module. See [AWS](../aws) for more information.
 
 Deploy:
 
@@ -132,6 +136,14 @@ $ minikube service traefik --https --url
 ```
 
 Verify that you can access The Things Join Server by navigating to `https://localhost:<port>/api/v2/openapi.json`.
+
+You can also use `ttjs` CLI with the local address. However, you need to configure the extra root CA in the Node environment:
+
+```env
+NODE_EXTRA_CA_CERTS=rootCA.pem
+```
+
+Replace `rootCA.pem` with the path of `mkcert`'s root CA file.
 
 ## Legal
 
