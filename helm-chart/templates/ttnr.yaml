@@ -1,0 +1,29 @@
+{{- if .Values.ttnr.enabled -}}
+kind: Certificate
+apiVersion: cert-manager.io/v1
+metadata:
+  name: {{ include "ttjs.fullname" . }}-ttnr
+  labels:
+    {{- include "ttjs.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  secretName: {{ include "ttjs.fullname" . }}-ttnr-cert
+  commonName: "The Things Join Server"
+  {{- with .Values.ingress.hosts }}
+  dnsNames:
+    {{- range . }}
+    - {{ .host }}
+    {{- end }}
+  {{- end }}
+  duration: 168h0m0s
+  issuerRef: {{ .Values.ttnr.certIssuerRef | toYaml | nindent 4 }}
+  renewBefore: 24h0m0s
+  usages:
+    - client auth
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+{{- end }}

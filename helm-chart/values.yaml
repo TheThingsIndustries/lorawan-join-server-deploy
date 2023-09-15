@@ -99,6 +99,15 @@ ingress:
   #    hosts:
   #      - ttjs.local
 
+# The Things Network Registry. Note: this is a The Things Industries internal service.
+ttnr:
+  enabled: false
+  address: "registry.thethings.industries:443"
+  # certIssuerRef:
+  #   group: ""
+  #   kind: ""
+  #   name: ""
+
 resources:
   {}
   # limits:
