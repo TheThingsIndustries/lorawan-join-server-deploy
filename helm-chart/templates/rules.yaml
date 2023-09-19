@@ -1,3 +1,4 @@
+{{- if .Values.serviceMonitor.enabled  -}}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -20,3 +21,4 @@ spec:
           annotations:
             description: |-
               The Things Join Server {{ .Release.Namespace }}/{{ include "ttjs.fullname" . }} did not accept a join-request.
+{{- end }}

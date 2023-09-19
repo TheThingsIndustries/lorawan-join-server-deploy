@@ -37,6 +37,12 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
+          {{- if .Values.ttnr.enabled }}
+          volumeMounts:
+            - name: ttnr
+              mountPath: "/etc/ttjs/ttnr"
+              readOnly: true
+          {{- end }}
           env:
             {{- with .Values.aws.region }}
             - name: AWS_REGION
@@ -82,6 +88,18 @@ spec:
               value: {{ printf "%s://%s" $scheme .host | quote }}
             {{- end }}
             {{- end }}
+            {{- if .Values.ttnr.enabled }}
+            - name: JS_TTNR_ENABLED
+              value: "true"
+            - name: "JS_TTNR_URL"
+              value: {{ printf "https://%s" .Values.ttnr.address | quote }}
+            - name: "JS_TTNR_ROOT_CA_FILE"
+              value: "/etc/ttjs/ttnr/ca.crt"
+            - name: "JS_TTNR_CERT_FILE"
+              value: "/etc/ttjs/ttnr/tls.crt"
+            - name: "JS_TTNR_KEY_FILE"
+              value: "/etc/ttjs/ttnr/tls.key"
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /livez
@@ -92,6 +110,12 @@ spec:
               port: 3000
           resources:
             {{- toYaml .Values.resources | nindent 12 }}            
+      {{- if .Values.ttnr.enabled }}
+      volumes:
+        - name: ttnr
+          secret:
+            secretName: {{ include "ttjs.fullname" . }}-ttnr-cert
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -44,7 +44,7 @@ Install:
 $ helm upgrade --install ttjs -f aws.values.yaml .
 ```
 
-### Local
+### Local: Minikube
 
 Since The Things Join Server currently exclusively uses AWS backends, you can run The Things Join Server locally but it uses resources deployed in AWS. To proceed, make sure you deployed [The Things Join Server in AWS](../aws) for development.
 

@@ -1,3 +1,13 @@
+variable "lorawan_client_source" {
+  type        = string
+  default     = "variables"
+  description = "Source of the LoRaWAN client: Network Servers and Application Servers. If 'variables', the LoRaWAN client is configured using the 'network_servers' and 'application_servers' variables. If 'external', The Things Join Server must be configured with an external source."
+  validation {
+    condition     = can(regex("^variables|external$", var.lorawan_client_source))
+    error_message = "The LoRaWAN client source must be either 'variables' or 'external'. When using 'external', the 'network_servers' and 'application_servers' variables must be empty."
+  }
+}
+
 variable "assume_role_principals" {
   type        = list(string)
   description = "Additional principals (users, roles) that can assume the role"
@@ -51,12 +61,7 @@ variable "network_servers" {
     name       = string
     truststore = string
   }))
-  default = {
-    "000013" = {
-      name       = "The Things Stack Cloud and Community Edition"
-      truststore = "truststores/the-things-industries.pem"
-    }
-  }
+  default = {}
   validation {
     condition = alltrue(
       [for id, network in var.network_servers : can(regex("^[0-9A-F]{6}(\\/[0-9A-F]{16})?$", id))],
