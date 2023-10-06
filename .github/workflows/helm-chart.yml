@@ -1,0 +1,28 @@
+name: Helm Chart
+on:
+  push:
+    tags:
+      - 'helm-chart/v*'
+
+jobs:
+  push:
+    name: Push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set version tag
+        id: vars
+        run: echo "tag=${GITHUB_REF_NAME#helm-chart/v}" >> $GITHUB_OUTPUT
+      - name: Check out code
+        uses: actions/checkout@v3
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.13.0'
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Package Helm chart
+        run: helm package helm-chart --version ${{ steps.vars.outputs.tag }}
+      - name: Push Helm chart
+        run: helm push lorawan-join-server-${{ steps.vars.outputs.tag }}.tgz oci://registry-1.docker.io/thethingsindustries
