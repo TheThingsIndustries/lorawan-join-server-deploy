@@ -60,7 +60,7 @@ resource "aws_iam_role" "server" {
         "Action": "sts:AssumeRoleWithWebIdentity",
         "Condition": {
           "StringEquals": {
-            "${local.eks_oidc_provider_url}:sub": "system:serviceaccount:${var.kubernetes_namespace}:ttjs"
+            "${local.eks_oidc_provider_url}:sub": "system:serviceaccount:${var.kubernetes_namespace}:${var.kubernetes_service_name}"
           }
         }
       }

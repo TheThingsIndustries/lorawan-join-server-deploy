@@ -39,6 +39,11 @@ variable "kubernetes_namespace" {
   default = "default"
 }
 
+variable "kubernetes_service_name" {
+  type    = string
+  default = "lorawan-join-server"
+}
+
 variable "provisioners" {
   type = map(object({
     name = string
