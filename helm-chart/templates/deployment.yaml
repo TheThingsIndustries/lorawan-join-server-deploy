@@ -44,6 +44,8 @@ spec:
               readOnly: true
           {{- end }}
           env:
+            - name: JS_JOIN_EUI
+              value: {{ .Values.joinEUI | quote }}
             {{- with .Values.aws.region }}
             - name: AWS_REGION
               value: {{ . | quote }}

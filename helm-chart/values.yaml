@@ -1,5 +1,7 @@
 replicaCount: 1
 
+joinEUI: "0000000000000000"
+
 image:
   repository: thethingsindustries/lorawan-join-server
   pullPolicy: IfNotPresent
