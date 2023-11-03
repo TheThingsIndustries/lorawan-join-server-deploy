@@ -116,7 +116,7 @@ spec:
       volumes:
         - name: ttnr
           secret:
-            secretName: {{ include "ttjs.fullname" . }}-ttnr-cert
+            secretName: {{ .Values.ttnr.existingSecret | default (printf "%s-ttnr-cert" (include "ttjs.fullname" .)) | quote }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

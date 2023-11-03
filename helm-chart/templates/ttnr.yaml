@@ -1,4 +1,4 @@
-{{- if .Values.ttnr.enabled -}}
+{{- if and .Values.ttnr.enabled (not .Values.ttnr.existingSecret) -}}
 kind: Certificate
 apiVersion: cert-manager.io/v1
 metadata:
@@ -11,7 +11,7 @@ metadata:
   {{- end }}
 spec:
   secretName: {{ include "ttjs.fullname" . }}-ttnr-cert
-  commonName: "The Things Join Server"
+  commonName: {{ .Values.ingress.hosts | first | .host | quote }}
   {{- with .Values.ingress.hosts }}
   dnsNames:
     {{- range . }}

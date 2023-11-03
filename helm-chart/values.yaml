@@ -105,6 +105,7 @@ ingress:
 ttnr:
   enabled: false
   address: "registry.thethings.industries:443"
+  # existingSecret: ""
   # certIssuerRef:
   #   group: ""
   #   kind: ""
