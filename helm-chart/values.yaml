@@ -8,6 +8,9 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+features:
+  disableNSIDCheck: false
+
 # Configuration for Amazon Web Services (AWS)
 aws:
   # The region to use.
