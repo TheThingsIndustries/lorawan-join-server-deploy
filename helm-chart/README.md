@@ -53,8 +53,7 @@ Install Traefik for local use:
 ```bash
 $ helm repo add traefik https://traefik.github.io/charts
 $ helm upgrade --install traefik traefik/traefik \
-  --set service.type=NodePort \
-  --set ports.web.expose=false
+  --set service.type=NodePort
 ```
 
 Generate a TLS server certificate that is valid for `localhost`:
