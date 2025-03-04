@@ -102,7 +102,7 @@ spec:
             - name: "JS_TTNR_KEY_FILE"
               value: "/etc/ttjs/ttnr/tls.key"
             {{- end }}
-            {{ with .Values.features.disableNSIDCheck }}
+            {{- with .Values.features.disableNSIDCheck }}
             - name: JS_FEATURES_DISABLE_NSID_CHECK
               value: {{ . | quote }}
             {{- end }}
