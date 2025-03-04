@@ -18,7 +18,7 @@ Prerequisites:
 
 The Things Join Server requires a proxy to terminate TLS. Currently, the only supported proxy is Traefik. [See Helm chart documentation](https://github.com/traefik/traefik-helm-chart).
 
-The Things Join Server uses a sevice account that is linked to the IAM role to access AWS resources. This is the default configuration.
+The Things Join Server uses a service account that is linked to the IAM role to access AWS resources. This is the default configuration.
 
 ```yaml
 # aws.values.yaml
