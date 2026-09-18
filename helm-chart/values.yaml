@@ -130,8 +130,21 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+podDisruptionBudget:
+  enabled: false
+  # minAvailable and maxUnavailable are mutually exclusive;
+  # unset maxUnavailable when setting minAvailable
+  # minAvailable: 1
+  maxUnavailable: 1
+
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+# labelSelector defaults to this chart's selector labels when not set
+topologySpreadConstraints: []
+# - maxSkew: 1
+#   topologyKey: topology.kubernetes.io/zone
+#   whenUnsatisfiable: ScheduleAnyway
