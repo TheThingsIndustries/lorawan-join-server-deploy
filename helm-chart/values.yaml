@@ -60,12 +60,10 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -94,8 +92,7 @@ rules:
 ingress:
   enabled: true
   className: ""
-  annotations:
-    {}
+  annotations: {}
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: ttjs.local
@@ -114,8 +111,7 @@ ttnr:
   #   kind: ""
   #   name: ""
 
-resources:
-  {}
+resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
@@ -130,8 +126,21 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+podDisruptionBudget:
+  enabled: false
+  # minAvailable and maxUnavailable are mutually exclusive;
+  # unset maxUnavailable when setting minAvailable
+  # minAvailable: 1
+  maxUnavailable: 1
+
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+# labelSelector defaults to this chart's selector labels when not set
+topologySpreadConstraints: []
+# - maxSkew: 1
+#   topologyKey: topology.kubernetes.io/zone
+#   whenUnsatisfiable: ScheduleAnyway
