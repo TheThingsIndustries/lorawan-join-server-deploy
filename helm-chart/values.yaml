@@ -60,12 +60,10 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -94,8 +92,7 @@ rules:
 ingress:
   enabled: true
   className: ""
-  annotations:
-    {}
+  annotations: {}
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: ttjs.local
@@ -114,8 +111,7 @@ ttnr:
   #   kind: ""
   #   name: ""
 
-resources:
-  {}
+resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
